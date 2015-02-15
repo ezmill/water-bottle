@@ -1,0 +1,30 @@
+<html>
+<head>
+	<title>water-bottle</title>
+	<style>
+		body{
+			margin: 0;
+		}
+	</style>
+</head>
+<body>
+<script id="fs" type="x-fragment/x-shader">
+	// varying vec2 vUv;
+	void main(){
+		gl_FragColor = vec4(0.0,1.0,0.0,0.0);
+	}
+</script>
+<script id="vs" type="x-shader/x-vertex">
+	varying vec2 vUv;
+	void main() {
+		vUv = uv;
+		gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+	}
+</script>
+<script src="js/three.min.js"></script>
+<script src="js/BinaryLoader.js"></script>
+<script src="js/Detector.js"></script>
+<script src="js/dat.gui.min.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
