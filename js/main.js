@@ -46,15 +46,19 @@ function initScene(){
     createBackgroundScene();
     createFeedbackScene();
     loadBottle();
+    onWindowResize();
 	animate();
 
 }
 function createBackgroundScene(){
-	tex = THREE.ImageUtils.loadTexture("textures/1.jpg");
+	tex = THREE.ImageUtils.loadTexture("textures/seed.png");
 	var materialParameters = {
 		uniforms: { 
 			time: { type: "f", value: 0.0 } ,
-			texture: { type: "t", value: tex } 
+			texture: { type: "t", value: tex },
+			resolution: {type: "v2", value: new THREE.Vector2(w,h)},
+			step_w: {type: "f", value: 1/w},
+			step_h: {type: "f", value: 1/h}
 		},
 		vertexShader: document.getElementById( 'vs' ).textContent,
 		fragmentShader: document.getElementById( 'fs' ).textContent
@@ -64,11 +68,15 @@ function createBackgroundScene(){
 	sceneRTT.add( quad );
 }
 function createFeedbackScene(){
-	var tex = THREE.ImageUtils.loadTexture("textures/1.jpg");
+	var tex = THREE.ImageUtils.loadTexture("textures/seed.png");
 	var materialFBParameters = {
 		uniforms: { 
 			time: { type: "f", value: 0.0 } ,
-			texture: { type: "t", value: rtTexture } 
+			texture: { type: "t", value: rtTexture },
+			resolution: {type: "v2", value: new THREE.Vector2()},
+			step_w: {type: "f", value: 1/w},
+			step_h: {type: "f", value: 1/h}
+ 
 		},
 		vertexShader: document.getElementById( 'vs' ).textContent,
 		fragmentShader: document.getElementById( 'fs-2' ).textContent
@@ -82,7 +90,7 @@ function loadBottle(){
     loader = new THREE.BinaryLoader(true);
     bottleMaterial = new THREE.MeshBasicMaterial({
 		color: 0xffffff,
-		map: rtFinal
+		map: rtFB
     })
     loader.load("js/models/water-bottle.js", function(geometry) {
         createBottle(geometry, bottleMaterial);
@@ -90,35 +98,47 @@ function loadBottle(){
 }
 function createBottle(geometry, material){
 	var bottle = new THREE.Mesh(geometry, material);
-	var scale = 1000.0;
+	var scale = 5000.0;
 	bottle.position.set(0,-100,-100);
 	bottle.scale.set(scale,scale,scale);
 	scene.add(bottle);
 }
+
+function onWindowResize( event ) {
+	material.uniforms.resolution.value.x = window.innerWidth;
+	material.uniforms.resolution.value.y = window.innerHeight;
+	materialFB.uniforms.resolution.value.x = window.innerWidth;
+	materialFB.uniforms.resolution.value.y = window.innerHeight;
+	renderer.setSize( window.innerWidth, window.innerHeight );
+}
+
 var inc = 0;
 var addFrames = true;
 function render(){
     camera.lookAt(scene.position);
-
-    // bottleMaterial.map = rtFB;
-    // inc++
-	// if(inc >= 10){
-		// addFrames = false;
-	// }
-	// if(addFrames){
-	    renderer.render(sceneRTT, cameraRTT, rtFB, true );
-	// }
-	renderer.render(sceneRTT, cameraRTT, rtTexture, true);
-	renderer.render(sceneFB, cameraRTT, rtFinal, true);
+    material.uniforms.texture.value = tex;
+    materialFB.uniforms.texture.value = rtTexture;
+    // bottleMaterial.map = rtFinal;
+    inc++
+	if(inc >= 10){
+		addFrames = false;
+	}
+	if(addFrames){
+		renderer.render(sceneRTT, cameraRTT, rtTexture, true);
+	}
+	renderer.render(sceneFB, cameraRTT, rtFB, true);
+    renderer.render(sceneFB, cameraRTT, rtFinal, true);
     renderer.render(scene, camera);
 
     var a = rtFB;
     rtFB = rtTexture;
-    rtTexture = rtFinal;
-    rtFinal = a;
+    rtTexture = a;
 
-    // material.uniforms.texture.value = rtTexture;
-    // materialFB.uniforms.texture.value = rtFinal;
+    // var b = tex;
+    // tex = rtFinal;
+    // rtFB = b;
+    // rtFinal = a;
+
 }
 function animate(){
 	window.requestAnimationFrame(animate);
