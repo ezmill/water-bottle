@@ -9,9 +9,29 @@
 </head>
 <body>
 <script id="fs" type="x-fragment/x-shader">
-	// varying vec2 vUv;
+	varying vec2 vUv;
+	uniform sampler2D texture;
 	void main(){
-		gl_FragColor = vec4(0.0,1.0,0.0,0.0);
+		gl_FragColor = texture2D(texture, vUv);
+	}
+</script>
+<script id="fs-2" type="x-fragment/x-shader">
+	varying vec2 vUv;
+	uniform sampler2D texture;
+	void main(){
+		// gl_FragColor = mix(texture2D(texture, vUv), vec4(1.0,0.0,0.0,0.0),0.5);
+		vec2 uv = vUv;
+	    //sample texture
+	    vec4 look = texture2D(texture,uv);
+	    //offset texture
+	    vec2 offs = vec2(look.y-look.x,look.w-look.z)*2.0;
+	    //relative coordinates
+	    vec2 coord = offs+uv;  
+	    //repositioned texture
+	    vec4 repos = texture2D(texture, coord);
+	    //final color
+	    gl_FragColor = repos;   
+		// gl_FragColor = vec4(1.0,0.0,1.0,0.0);
 	}
 </script>
 <script id="vs" type="x-shader/x-vertex">
