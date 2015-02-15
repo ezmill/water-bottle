@@ -73,8 +73,8 @@
 			
 			float am1 = 0.5 + 0.5*sin( time );
 			// float am1 = 0.01;
-			// float am2 = 0.5 + 0.5*cos( time );
-			float am2 = 0.1;
+			float am2 = 0.5 + 0.5*cos( time );
+			// float am2 = 0.1;
 
 			for( int i=0; i<20; i++ ){
 				//still not sure about this loop - this is where the magic happens
@@ -93,7 +93,7 @@
 				g = mix( g, f, am1 );
 				
 				//multiply new g times 0.01 times am2 and add it/subtract it to/from the texture coords
-				uv += 0.01*g*am2;
+				uv += 0.001*g*am2;
 			}
 			//texture color isnt changing, only texture coordinates
 			vec3 col = texture2D(texture, uv).xyz;

@@ -6,6 +6,7 @@ var h = window.innerHeight;
 var sceneRTT, cameraRTT;
 var sceneFB;
 var rtTexture, rtFB, rtFinal;
+var bottle;
 initScene();
 function initScene(){
 	container = document.createElement('div');
@@ -51,7 +52,7 @@ function initScene(){
 
 }
 function createBackgroundScene(){
-	tex = THREE.ImageUtils.loadTexture("textures/seed.png");
+	tex = THREE.ImageUtils.loadTexture("textures/caustics.jpg");
 	var materialParameters = {
 		uniforms: { 
 			time: { type: "f", value: 0.0 } ,
@@ -68,7 +69,7 @@ function createBackgroundScene(){
 	sceneRTT.add( quad );
 }
 function createFeedbackScene(){
-	var tex = THREE.ImageUtils.loadTexture("textures/seed.png");
+	var tex = THREE.ImageUtils.loadTexture("textures/caustics.jpg");
 	var materialFBParameters = {
 		uniforms: { 
 			time: { type: "f", value: 0.0 } ,
@@ -92,14 +93,15 @@ function loadBottle(){
 		color: 0xffffff,
 		map: rtFB
     })
-    loader.load("js/models/water-bottle.js", function(geometry) {
+    loader.load("js/models/water-bottle-2.js", function(geometry) {
         createBottle(geometry, bottleMaterial);
     });
 }
 function createBottle(geometry, material){
-	var bottle = new THREE.Mesh(geometry, material);
-	var scale = 5000.0;
-	bottle.position.set(0,-100,-100);
+	bottle = new THREE.Mesh(geometry, material);
+	var scale = 100.0;
+	bottle.position.set(50,-65,-100);
+	bottle.rotation.set(0,0,44.7);
 	bottle.scale.set(scale,scale,scale);
 	scene.add(bottle);
 }
@@ -114,7 +116,9 @@ function onWindowResize( event ) {
 
 var inc = 0;
 var addFrames = true;
+var translate = false;
 function render(){
+
     camera.lookAt(scene.position);
     material.uniforms.texture.value = tex;
     materialFB.uniforms.texture.value = rtTexture;
@@ -125,6 +129,11 @@ function render(){
 	}
 	if(addFrames){
 		renderer.render(sceneRTT, cameraRTT, rtTexture, true);
+		translate = true;
+	}
+	if(translate = true){
+		quad.scale.x = 1.008;
+		quad.scale.y = 1.008;
 	}
 	renderer.render(sceneFB, cameraRTT, rtFB, true);
     renderer.render(sceneFB, cameraRTT, rtFinal, true);
