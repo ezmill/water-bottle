@@ -34,6 +34,8 @@ function initScene(){
     rtFB.minFilter = THREE.LinearFilter;
     rtFB.magFilter = THREE.NearestFilter;
     rtFB.format = THREE.RGBFormat;
+    rtFB.wrapS = THREE.RepeatWrapping;
+    rtFB.wrapT = THREE.RepeatWrapping;
 
     rtFinal = new THREE.WebGLRenderTarget(w, h);
     rtFinal.minFilter = THREE.LinearFilter;
@@ -80,7 +82,7 @@ function createFeedbackScene(){
  
 		},
 		vertexShader: document.getElementById( 'vs' ).textContent,
-		fragmentShader: document.getElementById( 'fs-2' ).textContent
+		fragmentShader: document.getElementById( 'fs-2-no' ).textContent
 	}
 	materialFB = new THREE.ShaderMaterial( materialFBParameters );
 	quad = new THREE.Mesh( planeGeometry, materialFB );
@@ -89,10 +91,6 @@ function createFeedbackScene(){
 
 function loadBottle(){
     loader = new THREE.BinaryLoader(true);
-  //   bottleMaterial = new THREE.MeshBasicMaterial({
-		// color: 0xffffff,
-		// map: rtFB
-  //   })
 	bottleMaterial = new THREE.ShaderMaterial({
 		vertexShader: document.getElementById( 'vs' ).textContent,
 		fragmentShader: document.getElementById( 'fs' ).textContent,
@@ -105,7 +103,7 @@ function loadBottle(){
     // });
 	boxGeometry = new THREE.BoxGeometry(1000,1000,1000);
 
-	mesh = new THREE.Mesh(boxGeometry, bottleMaterial);
+	mesh = new THREE.Mesh(new THREE.SphereGeometry(500,100,100), bottleMaterial);
 	mesh.position.set(0,0,-1000);
 
 	scene.add(mesh);
@@ -130,16 +128,19 @@ function onWindowResize( event ) {
 var inc = 0;
 var addFrames = true;
 var translate = false;
+var time = 0;
 function render(){
-
+	time +=0.1;
     camera.lookAt(scene.position);
     material.uniforms.texture.value = tex;
+    material.uniforms.time.value = time;
     materialFB.uniforms.texture.value = rtTexture;
+    materialFB.uniforms.time.value = time;
     // bottleMaterial.map = rtFinal;
 
-    mesh.rotation.x = Date.now()*0.0002;
-    mesh.rotation.y = Date.now()*0.0002;
-    mesh.rotation.z = Date.now()*0.0002;
+    // mesh.rotation.x = Date.now()*0.0002;
+    // mesh.rotation.y = Date.now()*0.0002;
+    // mesh.rotation.z = Date.now()*0.0002;
     inc++
 	if(inc >= 10){
 		addFrames = false;
