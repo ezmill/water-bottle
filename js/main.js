@@ -89,19 +89,32 @@ function createFeedbackScene(){
 
 function loadBottle(){
     loader = new THREE.BinaryLoader(true);
-    bottleMaterial = new THREE.MeshBasicMaterial({
-		color: 0xffffff,
-		map: rtFB
-    })
-    loader.load("js/models/water-bottle-2.js", function(geometry) {
-        createBottle(geometry, bottleMaterial);
-    });
+  //   bottleMaterial = new THREE.MeshBasicMaterial({
+		// color: 0xffffff,
+		// map: rtFB
+  //   })
+	bottleMaterial = new THREE.ShaderMaterial({
+		vertexShader: document.getElementById( 'vs' ).textContent,
+		fragmentShader: document.getElementById( 'fs' ).textContent,
+		uniforms:{
+			texture: { type: "t", value: rtFB }
+		}
+	})
+    // loader.load("js/models/water-bottle-2.js", function(geometry) {
+    //     createBottle(geometry, bottleMaterial);
+    // });
+	boxGeometry = new THREE.BoxGeometry(1000,1000,1000);
+
+	mesh = new THREE.Mesh(boxGeometry, bottleMaterial);
+	mesh.position.set(0,0,-1000);
+
+	scene.add(mesh);
 }
 function createBottle(geometry, material){
 	bottle = new THREE.Mesh(geometry, material);
-	var scale = 100.0;
-	bottle.position.set(50,-65,-100);
-	bottle.rotation.set(0,0,44.7);
+	var scale = 1.0;
+	bottle.position.set(0,-1000,-2000);
+	// bottle.rotation.set(0,0,44.7);
 	bottle.scale.set(scale,scale,scale);
 	scene.add(bottle);
 }
@@ -123,6 +136,10 @@ function render(){
     material.uniforms.texture.value = tex;
     materialFB.uniforms.texture.value = rtTexture;
     // bottleMaterial.map = rtFinal;
+
+    mesh.rotation.x = Date.now()*0.0002;
+    mesh.rotation.y = Date.now()*0.0002;
+    mesh.rotation.z = Date.now()*0.0002;
     inc++
 	if(inc >= 10){
 		addFrames = false;
@@ -132,8 +149,8 @@ function render(){
 		translate = true;
 	}
 	if(translate = true){
-		quad.scale.x = 1.008;
-		quad.scale.y = 1.008;
+		// quad.scale.x = 1.008;
+		// quad.scale.y = 1.008;
 	}
 	renderer.render(sceneFB, cameraRTT, rtFB, true);
     renderer.render(sceneFB, cameraRTT, rtFinal, true);

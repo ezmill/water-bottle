@@ -15,7 +15,8 @@
 		gl_FragColor = texture2D(texture, vUv);
 	}
 </script>
-<script id="fs-2-no" type="x-fragment/x-shader">
+
+<script id="fs-2" type="x-fragment/x-shader">
 	varying vec2 vUv;
 	uniform sampler2D texture;
 	uniform vec2 resolution;
@@ -36,6 +37,9 @@
 		kernel[0] = -2.0; kernel[1] = -1.0; kernel[2] = 1.0;
 		kernel[3] = -1.0; kernel[4] = 1.0; kernel[5] = 1.0;
 		kernel[6] = 1.0; kernel[7] = 1.0; kernel[8] = 2.0;
+		// kernel[0] = 1.0; kernel[1] = 1.0; kernel[2] = 1.0;
+		// kernel[3] = 1.0; kernel[4] = 8.0; kernel[5] = 1.0;
+		// kernel[6] = 1.0; kernel[7] = 1.0; kernel[8] = 1.0;
 
 		vec4 sum = texture2D(texture, vUv);
 		for(int i = 0; i < 9; i++){
@@ -46,11 +50,11 @@
 		     kernelWeight = 1.0;
 		}
 
-		// gl_FragColor =(vec4((sum/kernelWeight).rgb, 1.0));
+		gl_FragColor =(vec4((sum/kernelWeight).rgb, 1.0));
 		// gl_FragColor =sum;
 	}
 </script>
-		<script id="fs-2" type="x-shader/x-fragment">
+		<script id="fs-2-no" type="x-shader/x-fragment">
 		uniform vec2 resolution;
 		uniform vec2 mouse;
 		uniform float time;
@@ -71,8 +75,8 @@
 			vec2 e = 1.0/resolution.xy;
 			
 			
-			float am1 = 0.5 + 0.5*sin( time );
-			// float am1 = 0.01;
+			// float am1 = 0.5 + 0.5*sin( time );
+			float am1 = 0.01;
 			float am2 = 0.5 + 0.5*cos( time );
 			// float am2 = 0.1;
 
@@ -93,7 +97,7 @@
 				g = mix( g, f, am1 );
 				
 				//multiply new g times 0.01 times am2 and add it/subtract it to/from the texture coords
-				uv += 0.001*g*am2;
+				uv += 0.01*g*am2;
 			}
 			//texture color isnt changing, only texture coordinates
 			vec3 col = texture2D(texture, uv).xyz;
@@ -102,6 +106,33 @@
 				
 			gl_FragColor = vec4(col, 1.0);
 		}
+		</script>
+				<script id="fs-2-no1" type="x-shader/x-fragment">
+		precision mediump float;
+		uniform sampler2D texture;
+		varying vec2 vUv;
+
+		// void main() {
+		// 	//this shader outputs the content of the feedback shader to the screen, texture represents feedback shader
+		//   vec4 color = texture2D(texture, vUv);
+		//   gl_FragColor = color;
+		// }
+
+		void main(){
+		    //vertex coords
+		    vec2 uv = vUv;
+		    //sample texture
+		    vec4 look = texture2D(texture,uv);
+		    //offset texture
+		    vec2 offs = vec2(look.y-look.x,look.w-look.z)*0.009;
+		    //relative coordinates
+		    vec2 coord = offs+uv;  
+		    //repositioned texture
+		    vec4 repos = texture2D(texture, coord);
+		    //final color
+		    gl_FragColor = repos;    
+		} 
+
 		</script>
 <script id="vs" type="x-shader/x-vertex">
 	varying vec2 vUv;
