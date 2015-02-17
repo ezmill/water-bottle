@@ -55,13 +55,11 @@ function initScene(){
 
 }
 function createBackgroundScene(){
-	tex = THREE.ImageUtils.loadTexture("textures/caustics.jpg");
-	tex2 = THREE.ImageUtils.loadTexture("textures/1.jpg");
+	tex = THREE.ImageUtils.loadTexture("textures/1.jpg");
 	var materialParameters = {
 		uniforms: { 
 			time: { type: "f", value: 0.0 } ,
 			texture: { type: "t", value: tex },
-			texture2: { type: "t", value: tex2 },
 			resolution: {type: "v2", value: new THREE.Vector2(w,h)},
 			step_w: {type: "f", value: 1/w},
 			step_h: {type: "f", value: 1/h},
@@ -69,7 +67,7 @@ function createBackgroundScene(){
 			mouseY: {type: "f", value: 1.0}
 		},
 		vertexShader: document.getElementById( 'vs' ).textContent,
-		fragmentShader: document.getElementById( 'fs-2-no' ).textContent
+		fragmentShader: document.getElementById( 'fs' ).textContent
 	}
 	material = new THREE.ShaderMaterial( materialParameters );
 	quad = new THREE.Mesh( planeGeometry, material );
@@ -81,16 +79,16 @@ function createFeedbackScene(){
 		uniforms: { 
 			time: { type: "f", value: 0.0 } ,
 			texture: { type: "t", value: rtTexture },
-			texture2: { type: "t", value: tex },
 			resolution: {type: "v2", value: new THREE.Vector2()},
 			step_w: {type: "f", value: 1/w},
 			step_h: {type: "f", value: 1/h},
 			mouseX: {type: "f", value: 1.0},
-			mouseY: {type: "f", value: 1.0}
+			mouseY: {type: "f", value: 1.0},
+			tv_resolution: {type: "f", value: 640.0}
  
 		},
 		vertexShader: document.getElementById( 'vs' ).textContent,
-		fragmentShader: document.getElementById( 'fs-2-1' ).textContent
+		fragmentShader: document.getElementById( 'fs-2' ).textContent
 	}
 	materialFB = new THREE.ShaderMaterial( materialFBParameters );
 	quad = new THREE.Mesh( planeGeometry, materialFB );
@@ -101,22 +99,18 @@ function loadBottle(){
     loader = new THREE.BinaryLoader(true);
 	bottleMaterial = new THREE.ShaderMaterial({
 		vertexShader: document.getElementById( 'vs' ).textContent,
-		fragmentShader: document.getElementById( 'fs-2-1' ).textContent,
+		fragmentShader: document.getElementById( 'fs-2' ).textContent,
 		uniforms:{
 			texture: { type: "t", value: rtFB }
 		}
 	})
-	// bottleMaterial = new THREE.MeshBasicMaterial({
-	// 	color: 0xffffff,
-	// 	map: rtTexture
-	// })
     // loader.load("js/models/water-bottle-2.js", function(geometry) {
     //     createBottle(geometry, bottleMaterial);
     // });
-	boxGeometry = new THREE.BoxGeometry(w,h,1000);
-
+	boxGeometry = new THREE.BoxGeometry(5000,5000,5000);
+	// sphereGeometry = new THREE.SphereGeometry(500,100,100);
 	mesh = new THREE.Mesh(boxGeometry, bottleMaterial);
-	mesh.position.set(0,0,-1000);
+	mesh.position.set(0,0,-5000);
 
 	scene.add(mesh);
 }
@@ -133,14 +127,16 @@ function map(value,max,minrange,maxrange) {
 }
 
 function onDocumentMouseMove(event){
-	mouseX = (event.clientX);
-    mouseY = (event.clientY);
+	mouseX = (event.clientX );
+    mouseY = (event.clientY );
     mapMouseX = map(mouseX, window.innerWidth, -1.0,1.0);
     mapMouseY = map(mouseY, window.innerHeight, -1.0,1.0);
-	material.uniforms.mouseX.value = mouseX;
-	material.uniforms.mouseY.value = mouseY;
+    resX = map(mouseX, window.innerWidth, 6000.0,0.0);
+	material.uniforms.mouseX.value = mapMouseX;
+	material.uniforms.mouseY.value = mapMouseY;
 	materialFB.uniforms.mouseX.value = mapMouseX;
 	materialFB.uniforms.mouseY.value = mapMouseY;
+	materialFB.uniforms.tv_resolution.value = resX;
 
 
 }
@@ -159,7 +155,7 @@ var addFrames = true;
 var translate = false;
 var time = 0;
 function render(){
-	time +=0.0005;
+	time +=0.1;
     camera.lookAt(scene.position);
     material.uniforms.texture.value = tex;
     material.uniforms.time.value = time;
@@ -168,8 +164,8 @@ function render(){
     // bottleMaterial.map = rtFinal;
 
     // mesh.rotation.x = Date.now()*0.0002;
-    // mesh.rotation.y += mapMouseX*0.01;
-    // mesh.rotation.z += mapMouseY*0.01;
+    mesh.rotation.y += mapMouseX*0.01;
+    mesh.rotation.z += mapMouseY*0.01;
     inc++
 	if(inc >= 10){
 		addFrames = false;
